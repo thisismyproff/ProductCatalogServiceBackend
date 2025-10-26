@@ -5,6 +5,7 @@ import com.mayur.ProductCatalogService.dtos.ProductDTO;
 import com.mayur.ProductCatalogService.models.Product;
 import com.mayur.ProductCatalogService.services.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
@@ -23,7 +24,7 @@ public class ProductController {
     private final ProductConverter productConverter;
 
     @Autowired
-    public ProductController(IProductService iProductService, ProductConverter productConverter) {
+    public ProductController( IProductService iProductService, ProductConverter productConverter) {
         this.iProductService = iProductService;
         this.productConverter = productConverter;
     }
@@ -69,5 +70,14 @@ public class ProductController {
         }
     }
 
+    @PostMapping ("/products")
+    ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDTO) {
+        Product product = iProductService.createProduct(productConverter.getProductFromDto(productDTO));
+        if (product == null) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        } else {
+            return new ResponseEntity<>(productConverter.convertToDto(product), HttpStatus.CREATED);
+        }
+    }
 
 }

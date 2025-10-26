@@ -19,7 +19,6 @@ public class Product extends  BaseModel {
     @ManyToOne(cascade= CascadeType.ALL)
     private Category category;
 
-    //Business Logic
     private boolean isPrime;
 
 

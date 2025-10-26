@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 public class ProductConverter {
     public ProductDTO convertToDto(Product product) {
         ProductDTO productDTO = new ProductDTO();
+        productDTO.setId(product.getId());
         productDTO.setName(product.getName());
         productDTO.setDescription(product.getDescription());
         productDTO.setImageUrl(product.getImageUrl());
@@ -49,12 +50,14 @@ public class ProductConverter {
     }
     public Product getProductFromDto(ProductDTO productDTO) {
         Product product = new Product();
+        product.setId(productDTO.getId());
         product.setName(productDTO.getName());
         product.setDescription(productDTO.getDescription());
         product.setImageUrl(productDTO.getImageUrl());
         product.setPrice(productDTO.getPrice());
         if (productDTO.getCategoryDTO() != null) {
             Category category = new Category();
+            category.setId(productDTO.getCategoryDTO().getId());
             category.setName(productDTO.getCategoryDTO().getName());
             category.setDescription(productDTO.getCategoryDTO().getDescription());
             product.setCategory(category);
