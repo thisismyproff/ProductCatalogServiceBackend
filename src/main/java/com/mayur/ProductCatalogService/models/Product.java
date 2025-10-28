@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.Date;
 
@@ -27,4 +28,6 @@ public class Product extends  BaseModel {
         this.setLastUpdatedAt(new Date());
         this.setState(State.ACTIVE);
     }
+
+
 }
