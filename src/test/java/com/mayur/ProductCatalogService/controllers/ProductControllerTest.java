@@ -4,7 +4,6 @@ import com.mayur.ProductCatalogService.dtos.ProductDTO;
 import com.mayur.ProductCatalogService.models.Product;
 import com.mayur.ProductCatalogService.services.IProductService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
@@ -49,11 +48,28 @@ class ProductControllerTest {
 
 
     @Test
-    void updateProduct() {
+    void testGetProductById_withInvalidId() {
+        //Arrange
+        Long productId = -1L;
+        //Assert
+        Exception exception = assertThrows(IllegalArgumentException.class,()-> productController.getProductById(productId));
+
+        assertEquals("Please give id greater than zero", exception.getMessage());
+
+
     }
 
     @Test
-    void getAllProducts() {
+    void testGetProductById_withRuntimeException() {
+        //Arrange
+        Long productId = 20000L;
+
+        when(iProductService.getProductById(productId)).thenThrow(new RuntimeException("Product with id " + productId + " not found"));
+
+        Exception e =assertThrows(RuntimeException.class, () -> productController.getProductById(productId));
+        assertEquals("Product with id " + productId + " not found", e.getMessage());
+
+
     }
 
     @Test
