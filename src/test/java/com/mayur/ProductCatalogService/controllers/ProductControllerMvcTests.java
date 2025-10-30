@@ -1,5 +1,6 @@
 package com.mayur.ProductCatalogService.controllers;
 
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mayur.ProductCatalogService.coverters.ProductConverter;
 import com.mayur.ProductCatalogService.dtos.ProductDTO;
@@ -8,17 +9,16 @@ import com.mayur.ProductCatalogService.services.IProductService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ProductController.class)
 public class ProductControllerMvcTests {
@@ -72,7 +72,42 @@ public class ProductControllerMvcTests {
         // Act & Assert
         mockMvc.perform(get("/products"))
                 .andExpect(status().isOk())
-                .andExpect(content().json(expectedJson));
+                .andExpect(content().string(expectedJson))
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[1].id").value(2L))
+                .andExpect(jsonPath("$.length()").value(2));
+
     }
+
+    @Test
+    public void testCreateProduct_Success() throws Exception {
+        Product product = new Product();
+        product.setId(6L);
+        product.setName("MackBook Pro");
+        product.setDescription("Apple MackBook Pro 2023");
+        product.setPrice(1999.99);
+
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setId(6L);
+        productDTO.setName("MackBook Pro");
+        productDTO.setDescription("Apple MackBook Pro 2023");
+        productDTO.setPrice(1999.99);
+
+        when(productConverter.getProductFromDto(any(ProductDTO.class))).thenReturn(product);
+        when(productService.createProduct(any(Product.class))).thenReturn(product);
+        when(productConverter.convertToDto(any(Product.class))).thenReturn(productDTO);
+
+        String requestJson = objectMapper.writeValueAsString(productDTO);
+        String expectedJson = objectMapper.writeValueAsString(productDTO);
+
+        mockMvc.perform(post("/products")
+                        .content(requestJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(content().string(expectedJson))
+                .andExpect(jsonPath("$.id").value(6L))
+                .andExpect(jsonPath("$.name").value("MackBook Pro"));
+    }
+
 
 }
